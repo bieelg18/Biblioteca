@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface LivroRepository extends JpaRepository<Livro, Integer> {
 
-    Optional<Livro> findByNomeLivro(String nome);
+    Optional<Livro> findByLivro(String nome);
 
 }
