@@ -4,8 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface LivroRepository extends JpaRepository {
+public interface LivroRepository extends JpaRepository<Livro, Integer> {
 
-    Optional<Livro> findByLivro(String livro);
+    Optional<Livro> findByNomeLivro(String nome);
 
 }
