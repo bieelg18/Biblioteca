@@ -2,6 +2,7 @@ package dev.bieelg.Biblioteca.Usuario;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.bieelg.Biblioteca.Livro.Livro;
+import dev.bieelg.Biblioteca.Livro.LivroDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,6 @@ public class UsuarioDTO {
     private Integer id;
     private String nome;
     private String email;
-    private List<Livro> livros;
+    private List<LivroDTO> livros;
 
 }

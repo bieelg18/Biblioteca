@@ -17,6 +17,6 @@ public class LivroDTO {
     private String livro;
     private String autor;
     private StatusLivro status;
-    private Usuario usuario;
+    private Integer usuarioId;
 
 }
