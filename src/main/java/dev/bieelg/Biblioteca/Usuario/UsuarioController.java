@@ -1,40 +1,38 @@
 package dev.bieelg.Biblioteca.Usuario;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
+@RequiredArgsConstructor
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
-
     //Endpoint para criar usuarios
     @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario usuario){
+    public UsuarioDTO criarUsuario(@RequestBody UsuarioDTO usuario){
         return usuarioService.criarUsuario(usuario);
     }
 
     //Endpoint para listar todos os usuarios
     @GetMapping
-    public List<Usuario> buscarUsuarios(){
+    public List<UsuarioDTO> buscarUsuarios(){
         return usuarioService.usuarios();
     }
 
     //Endpoint para buscar usuario por email
     @GetMapping("/buscar")
-    public Usuario buscarPorEmail(@RequestParam String email){
+    public UsuarioDTO buscarPorEmail(@RequestParam String email){
         return usuarioService.buscarPorEmail(email);
     }
 
     //Endpoint para atualizar usuario
     @PatchMapping("/{id}")
-    public Usuario atualizarUser(@PathVariable Integer id, @RequestBody Usuario usuario){
+    public UsuarioDTO atualizarUser(@PathVariable Integer id, @RequestBody UsuarioDTO usuario){
         return usuarioService.atualizarUsuario(id, usuario);
     }
 

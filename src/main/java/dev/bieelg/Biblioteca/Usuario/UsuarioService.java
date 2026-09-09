@@ -12,20 +12,33 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper;
 
     //Criando usuario
-    public Usuario criarUsuario(Usuario usuario){
-        return usuarioRepository.save(usuario);
+    public UsuarioDTO criarUsuario(UsuarioDTO usuarioDTO){
+        Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        return usuarioMapper.toDTO(usuarioSalvo);
     }
 
     //Listando todos os usuarios
-    public List<Usuario> usuarios(){
-        return usuarioRepository.findAll();
+    public List<UsuarioDTO> usuarios(){
+        List<Usuario> usuarios = usuarioRepository.findAll();
+
+        return usuarios.stream()
+                .map(usuarioMapper::toDTO)
+                .toList();
     }
 
     //Buscar usuario por e-mail
-    public Usuario buscarPorEmail(String email){
-        return usuarioRepository.findByEmail(email).orElse(null);
+    public UsuarioDTO buscarPorEmail(String email){
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(email);
+
+        if (usuarioExistente.isPresent()){
+            Usuario usuario = usuarioExistente.get();
+            return usuarioMapper.toDTO(usuario);
+        }
+        return null;
     }
 
     //Deletando usuario por id
@@ -34,18 +47,18 @@ public class UsuarioService {
     }
 
     //Alterando dados do usuario
-    public Usuario atualizarUsuario(Integer id, Usuario usuario){
+    public UsuarioDTO atualizarUsuario(Integer id, UsuarioDTO usuarioDTO){
         Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
         if (usuarioExistente.isPresent()){
             Usuario user = usuarioExistente.get();
-            if (usuario.getNome() != null){
-                user.setNome(usuario.getNome());
+            if (usuarioDTO.getNome() != null){
+                user.setNome(usuarioDTO.getNome());
             }
-            if (usuario.getEmail() != null){
-                user.setEmail(usuario.getEmail());
+            if (usuarioDTO.getEmail() != null){
+                user.setEmail(usuarioDTO.getEmail());
             }
             Usuario userSalvo = usuarioRepository.save(user);
-            return userSalvo;
+            return usuarioMapper.toDTO(userSalvo);
         }
         return null;
     }
