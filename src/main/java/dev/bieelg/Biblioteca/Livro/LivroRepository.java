@@ -7,10 +7,10 @@ import java.util.Optional;
 
 public interface LivroRepository extends JpaRepository<Livro, Integer> {
 
-    Optional<Livro> findByLivro(String nome);
+    List<Livro> findByLivroContainingIgnoreCase(String nome);
 
     List<Livro> findByStatus(StatusLivro status);
 
-    Optional<Livro> findByAutor(String autor);
+    List<Livro> findByAutorContainingIgnoreCase(String autor);
 
 }

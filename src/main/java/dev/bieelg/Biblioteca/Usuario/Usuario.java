@@ -1,5 +1,6 @@
 package dev.bieelg.Biblioteca.Usuario;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dev.bieelg.Biblioteca.Livro.Livro;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class Usuario {
     private String email;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private List<Livro> livros;
 
 }
