@@ -1,6 +1,7 @@
 package dev.bieelg.Biblioteca.Usuario;
 
 
+import dev.bieelg.Biblioteca.Exception.RecursoNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,35 +33,40 @@ public class UsuarioService {
 
     //Buscar usuario por e-mail
     public UsuarioDTO buscarPorEmail(String email){
-        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(email);
-
-        if (usuarioExistente.isPresent()){
-            Usuario usuario = usuarioExistente.get();
-            return usuarioMapper.toDTO(usuario);
-        }
-        return null;
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuario com email " + email + " não encontrado"
+                ));
+        return usuarioMapper.toDTO(usuario);
     }
 
     //Deletando usuario por id
     public void deletarPorId(Integer id){
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário com o ID " + id + " não encontrado"
+                ));
+
+        usuarioRepository.delete(usuario);
     }
 
     //Alterando dados do usuario
-    public UsuarioDTO atualizarUsuario(Integer id, UsuarioDTO usuarioDTO){
-        Optional<Usuario> usuarioExistente = usuarioRepository.findById(id);
-        if (usuarioExistente.isPresent()){
-            Usuario user = usuarioExistente.get();
-            if (usuarioDTO.getNome() != null){
-                user.setNome(usuarioDTO.getNome());
-            }
-            if (usuarioDTO.getEmail() != null){
-                user.setEmail(usuarioDTO.getEmail());
-            }
-            Usuario userSalvo = usuarioRepository.save(user);
-            return usuarioMapper.toDTO(userSalvo);
+    public UsuarioDTO atualizarUsuario(Integer id, UsuarioDTO usuarioDTO) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário com ID " + id + " não encontrado"
+                ));
+        if (usuarioDTO.getNome() != null) {
+            usuario.setNome(usuarioDTO.getNome());
         }
-        return null;
+        if (usuarioDTO.getEmail() != null) {
+            usuario.setEmail(usuarioDTO.getEmail());
+        }
+
+        Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        return usuarioMapper.toDTO(usuarioSalvo);
+
+
     }
 
 }

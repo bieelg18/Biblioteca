@@ -1,5 +1,8 @@
 package dev.bieelg.Biblioteca.Livro;
 
+import dev.bieelg.Biblioteca.Exception.LivroIndisponivelException;
+import dev.bieelg.Biblioteca.Exception.LivroJaDisponivelException;
+import dev.bieelg.Biblioteca.Exception.RecursoNaoEncontradoException;
 import dev.bieelg.Biblioteca.Usuario.Usuario;
 import dev.bieelg.Biblioteca.Usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,11 @@ public class LivroService {
 
     //Deletando livro por id
     public void deletarLivro(Integer id){
-        livroRepository.deleteById(id);
+        Livro livro = livroRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Livro com o ID " + id + " não encontrado"
+                ));
+        livroRepository.delete(livro);
     }
 
     //Listando apenas livros disponiveis
@@ -67,20 +74,20 @@ public class LivroService {
 
     //Alterando dados dos livros
     public LivroDTO atualizarLivro(Integer id, LivroDTO livroDTO){
-        Optional<Livro> livroExistente = livroRepository.findById(id);
-        if (livroExistente.isPresent()){
-            Livro livro1 = livroExistente.get();
-            if (livroDTO.getLivro() != null){
-                livro1.setLivro(livroDTO.getLivro());
-            }
-            if (livroDTO.getAutor() != null){
-                livro1.setAutor(livroDTO.getAutor());
-            }
+        Livro livro = livroRepository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Livro com o ID " + id + " não encontrado"
+                ));
 
-            Livro livroSalvo = livroRepository.save(livro1);
-            return livroMapper.toDTO(livroSalvo);
+        if (livroDTO.getLivro() != null){
+            livro.setLivro(livroDTO.getLivro());
         }
-        return null;
+        if (livroDTO.getAutor() != null){
+            livro.setAutor(livroDTO.getAutor());
+        }
+        Livro livroSalvo = livroRepository.save(livro);
+
+        return livroMapper.toDTO(livroSalvo);
     }
 
     //Buscando livros pelo nome do autor
@@ -94,35 +101,41 @@ public class LivroService {
 
     //Emprestando um livro que está disponivel
     public LivroDTO emprestarLivro(Integer idLivro, Integer idUsuario){
-        Optional<Livro> livroExistente = livroRepository.findById(idLivro);
-        Optional<Usuario> usuarioExistente = usuarioRepository.findById(idUsuario);
-        if (livroExistente.isPresent() && usuarioExistente.isPresent()){
-            Livro livro = livroExistente.get();
-            Usuario user = usuarioExistente.get();
-            if (livro.getStatus() == StatusLivro.DISPONIVEL){
-                livro.setUsuario(user);
-                livro.setStatus(StatusLivro.EMPRESTADO);
-                Livro livroSalvo = livroRepository.save(livro);
-                return livroMapper.toDTO(livroSalvo);
-            }
-            return null;
+        Livro livro = livroRepository.findById(idLivro)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Livro com o ID " + idLivro + " não encontrado"
+                ));
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "Usuário com o ID " + idUsuario + " não encontrado"
+                ));
+
+        if (livro.getStatus() != StatusLivro.DISPONIVEL){
+            throw new LivroIndisponivelException(
+                    "O livro já está emprestado"
+            );
         }
-        return null;
+        livro.setUsuario(usuario);
+        livro.setStatus(StatusLivro.EMPRESTADO);
+        Livro livroSalvo = livroRepository.save(livro);
+        return livroMapper.toDTO(livroSalvo);
     }
 
     //Devolvendo um livro emprestado
-    public LivroDTO devolverLivro(Integer idLivro){
-        Optional<Livro> livroExistente = livroRepository.findById(idLivro);
-        if (livroExistente.isPresent()){
-            Livro livro = livroExistente.get();
-            if (livro.getStatus() == StatusLivro.EMPRESTADO){
-                livro.setUsuario(null);
-                livro.setStatus(StatusLivro.DISPONIVEL);
-                Livro livroSalvo = livroRepository.save(livro);
-                return livroMapper.toDTO(livroSalvo);
-            }
-            return null;
+    public LivroDTO devolverLivro(Integer idLivro) {
+        Livro livro = livroRepository.findById(idLivro)
+                .orElseThrow(() -> new RecursoNaoEncontradoException(
+                        "O livro com o ID " + idLivro  + " não foi encontrado"
+                ));
+
+        if (livro.getStatus() != StatusLivro.EMPRESTADO) {
+            throw new LivroJaDisponivelException(
+                    "O livro não está emprestado para ninguém"
+            );
         }
-        return null;
+        livro.setUsuario(null);
+        livro.setStatus(StatusLivro.DISPONIVEL);
+        Livro livroSalvo = livroRepository.save(livro);
+        return livroMapper.toDTO(livroSalvo);
     }
 }
