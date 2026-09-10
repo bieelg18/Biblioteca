@@ -9,7 +9,7 @@ public interface LivroMapper {
     @Mapping(source = "usuario.id", target = "usuarioId")
     LivroDTO toDTO(Livro livro);
 
-    @Mapping(source = "usuarioId", target = "usuario.id")
+    @Mapping(target = "usuario", ignore = true)
     Livro toEntity(LivroDTO livroDTO);
 
 }
