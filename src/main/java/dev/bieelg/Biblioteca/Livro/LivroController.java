@@ -8,7 +8,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/livros")
 @RequiredArgsConstructor
-public class LivroController {
+public class LivroController implements LivroControllerDocs{
 
     private final LivroService livroService;
 
@@ -49,13 +49,13 @@ public class LivroController {
     }
 
     //Endpoint para emprestar um livro
-    @PostMapping("/emprestar/{idLivro}/{idUser}")
+    @PatchMapping("/emprestar/{idLivro}/{idUser}")
     public LivroDTO emprestarLivro(@PathVariable Integer idLivro, @PathVariable Integer idUser){
         return livroService.emprestarLivro(idLivro, idUser);
     }
 
     //Endpoint para devolver um livro
-    @PostMapping("/devolver/{idLivro}")
+    @PatchMapping("/devolver/{idLivro}")
     public LivroDTO devolverLivro(@PathVariable Integer idLivro){
         return livroService.devolverLivro(idLivro);
     }
